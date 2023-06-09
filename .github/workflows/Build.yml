@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+      
+  Veracode_SAST:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download Artefato
+        uses: actions/download-artifact@v2
+        with:
+          name: pacoteVeracode
+      - uses: veracode/veracode-uploadandscan-action@master # Faz a analise da Veracode
+        env:
+          VID: 'fc91d654693390d73ce3088b95004aeb' # Lembrar de criar as credenciais no Secrets
+          VKEY: 'a9133442205c6624805dfa8b0306823ef6bfc548416224491594cb2a907ae573f1df6ad2f746e8693d0fc8f66a1b281efba343e04afdf61c52ce994f6ff21e73'
+          AppName: Github Actions - ${{ github.repository }}
+        with:
+          vid: '$VID'
+          vkey: '$VKEY'
+          criticality: 'VeryHigh'
+          appname: 'WebGoatAction'
+          createsandbox: true
+          filepath: 'veracode.zip'
+          deleteIncompleteScan: false
+          version: ${{ github.run_id }}
