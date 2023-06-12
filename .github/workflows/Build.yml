@@ -45,7 +45,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: pacoteVeracode
-          path: target
+          path: target/$ARTIFACT_NAME
       - uses: veracode/veracode-uploadandscan-action@master # Faz a analise da Veracode
         env:
           VID: 'fc91d654693390d73ce3088b95004aeb' # Lembrar de criar as credenciais no Secrets
