@@ -32,6 +32,11 @@ jobs:
         mvn -B package --file pom.xml
         ARTIFACT_NAME=$(mvn -q -Dexec.executable="echo" -Dexec.args='WebGoat.jar' --non-recursive exec:exec)
       
+    - name: Publicando Artefato
+      uses: actions/upload-artifact@v2
+      with:
+        name: pacoteVeracode
+        path: ARTIFACT_NAME
   Veracode_SAST:
     runs-on: ubuntu-latest
     needs: build
