@@ -58,7 +58,8 @@ jobs:
           vkey: '$VKEY'
           criticality: 'VeryHigh'
           appname: 'WebGoatAction'
+          createprofile: true
           createsandbox: true
-          filepath: target/${{ steps.artifactName.outputs.run }}
+          filepath: target/${{ env.ARTIFACT_NAME }}
           deleteIncompleteScan: false
           version: ${{ github.run_id }}
