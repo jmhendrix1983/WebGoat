@@ -32,7 +32,7 @@ jobs:
         mvn -B package --file pom.xml
         ARTIFACT_NAME=$(mvn -q --file pom.xml help:evaluate -Dexpression=project.build.finalName -DforceStdout)
         ARTIFACT_NAME="$ARTIFACT_NAME.jar"
-        echo "::set-env name=ARTIFACT_NAME::$ARTIFACT_NAME"
+        echo $ARTIFACT_NAME >> $GITHUB_ENV
     - name: Publicando Artefato
       uses: actions/upload-artifact@v2
       with:
@@ -46,6 +46,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: pacoteVeracode
+          path: target/${{ env.ARTIFACT_NAME }}
       - uses: veracode/veracode-uploadandscan-action@master # Faz a analise da Veracode
         env:
           VID: 'fc91d654693390d73ce3088b95004aeb' # Lembrar de criar as credenciais no Secrets
