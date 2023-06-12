@@ -48,11 +48,6 @@ jobs:
         with:
           name: pacoteVeracode
 
-      - name: Extrair Artefato
-        run: |
-          unzip -q ${{ github.workspace }}/target/pacoteVeracode.zip -d ${{ github.workspace }}/target
-          ls ${{ github.workspace }}/target
-
       - name: Ler Nome do Artefato
         id: artifactName
         run: |
