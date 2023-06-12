@@ -50,8 +50,8 @@ jobs:
 
       - name: Criar Arquivo Zip
         run: |
-          cd ${{ github.workspace }}/target
-          zip -r veracode.zip ${{ env.ARTIFACT_NAME }}
+          cd ${{ github.workspace }}
+          zip -r target/veracode.zip target/${{ env.ARTIFACT_NAME }}
 
       - name: Ler Nome do Artefato
         id: artifactName
@@ -62,7 +62,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: veracodeZip
-          path: ${{ github.workspace }}/target/veracode.zip
+          path: target/veracode.zip
 
       - uses: veracode/veracode-uploadandscan-action@master # Faz a análise da Veracode
         env:
@@ -75,7 +75,6 @@ jobs:
           criticality: 'VeryHigh'
           appname: 'WebGoatAction'
           createsandbox: true
-          createProfile: true
           filepath: target/${{ steps.artifactName.outputs.run }}
           deleteIncompleteScan: false
           version: ${{ github.run_id }}
