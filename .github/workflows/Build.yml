@@ -9,35 +9,36 @@ on:
       - main
 
 env:
-  ARTIFACT_NAME: ''
+  ARTIFACT_NAME_FILE: 'artifact_name.txt'
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: 17
-        architecture: x64
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          architecture: x64
 
-    - name: Build with Maven
-      run: |
-        mvn -B package --file pom.xml
-        ARTIFACT_NAME=$(mvn -q --file pom.xml help:evaluate -Dexpression=project.build.finalName -DforceStdout)
-        ARTIFACT_NAME="$ARTIFACT_NAME.jar"
-        echo $ARTIFACT_NAME >> $GITHUB_ENV
-    - name: Publicando Artefato
-      uses: actions/upload-artifact@v2
-      with:
-        name: pacoteVeracode
-        path: target/${{ env.ARTIFACT_NAME }}
+      - name: Build with Maven
+        run: |
+          mvn -B package --file pom.xml
+          ARTIFACT_NAME=$(mvn -q --file pom.xml help:evaluate -Dexpression=project.build.finalName -DforceStdout)
+          ARTIFACT_NAME="$ARTIFACT_NAME.jar"
+          echo $ARTIFACT_NAME >> $GITHUB_ENV
+          echo $ARTIFACT_NAME > ${{ env.ARTIFACT_NAME_FILE }}
+
+      - name: Publicando Artefato
+        uses: actions/upload-artifact@v2
+        with:
+          name: pacoteVeracode
+          path: target/${{ env.ARTIFACT_NAME }}
+
   Veracode_SAST:
     runs-on: ubuntu-latest
     needs: build
@@ -46,11 +47,18 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: pacoteVeracode
-      - name: Renomear Artefato
+
+      - name: Extrair Artefato
         run: |
-          mv ${{ github.workspace }}/target/* ${{ github.workspace }}/target/${{ env.ARTIFACT_NAME }}
+          unzip -q ${{ github.workspace }}/target/pacoteVeracode.zip -d ${{ github.workspace }}/target
           ls ${{ github.workspace }}/target
-      - uses: veracode/veracode-uploadandscan-action@master # Faz a analise da Veracode
+
+      - name: Ler Nome do Artefato
+        id: artifactName
+        run: |
+          echo ::set-output name=artifact_name::$(cat ${{ env.ARTIFACT_NAME_FILE }})
+
+      - uses: veracode/veracode-uploadandscan-action@master # Faz a análise da Veracode
         env:
           VID: 'fc91d654693390d73ce3088b95004aeb' # Lembrar de criar as credenciais no Secrets
           VKEY: 'a9133442205c6624805dfa8b0306823ef6bfc548416224491594cb2a907ae573f1df6ad2f746e8693d0fc8f66a1b281efba343e04afdf61c52ce994f6ff21e73'
@@ -61,6 +69,6 @@ jobs:
           criticality: 'VeryHigh'
           appname: 'WebGoatAction'
           createsandbox: true
-          filepath: target/${{ env.ARTIFACT_NAME }}
+          filepath: target/${{ steps.artifactName.outputs.artifact_name }}
           deleteIncompleteScan: false
           version: ${{ github.run_id }}
