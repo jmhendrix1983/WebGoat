@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: pacoteVeracode
-          path: target/${{ env.ARTIFACT_NAME_FILE }}
+          path: target/${{ env.ARTIFACT_NAME }}
 
   Veracode_SAST:
     runs-on: ubuntu-latest
@@ -47,6 +47,22 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: pacoteVeracode
+
+      - name: Criar Arquivo Zip
+        run: |
+          cd ${{ github.workspace }}/target
+          zip -r veracode.zip ${{ env.ARTIFACT_NAME }}
+
+      - name: Ler Nome do Artefato
+        id: artifactName
+        run: |
+          cat ${{ github.workspace }}/${{ env.ARTIFACT_NAME_FILE }}
+
+      - name: Publicar Arquivo Zip
+        uses: actions/upload-artifact@v2
+        with:
+          name: veracodeZip
+          path: ${{ github.workspace }}/target/veracode.zip
 
       - uses: veracode/veracode-uploadandscan-action@master # Faz a análise da Veracode
         env:
@@ -58,8 +74,8 @@ jobs:
           vkey: '$VKEY'
           criticality: 'VeryHigh'
           appname: 'WebGoatAction'
-          createprofile: true
           createsandbox: true
-          filepath: target/${{ env.ARTIFACT_NAME_FILE }}
+          createProfile: true
+          filepath: target/${{ steps.artifactName.outputs.run }}
           deleteIncompleteScan: false
           version: ${{ github.run_id }}
