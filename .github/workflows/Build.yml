@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: pacoteVeracode
-          path: target/${{ env.ARTIFACT_NAME }}
+          path: target/${{ env.ARTIFACT_NAME_FILE }}
 
   Veracode_SAST:
     runs-on: ubuntu-latest
@@ -60,6 +60,6 @@ jobs:
           appname: 'WebGoatAction'
           createprofile: true
           createsandbox: true
-          filepath: target/${{ env.ARTIFACT_NAME }}
+          filepath: target/${{ env.ARTIFACT_NAME_FILE }}
           deleteIncompleteScan: false
           version: ${{ github.run_id }}
