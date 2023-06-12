@@ -37,7 +37,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: pacoteVeracode
-        path: target/${{ env.ARTIFACT_NAME }}
+        path: ${{ env.ARTIFACT_NAME }}
   Veracode_SAST:
     runs-on: ubuntu-latest
     needs: build
@@ -46,7 +46,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: pacoteVeracode
-          path: target/${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_NAME }}
       - uses: veracode/veracode-uploadandscan-action@master # Faz a analise da Veracode
         env:
           VID: 'fc91d654693390d73ce3088b95004aeb' # Lembrar de criar as credenciais no Secrets
