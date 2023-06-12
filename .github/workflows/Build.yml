@@ -36,7 +36,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: pacoteVeracode
-        path: ./app/target/webgoat.jar
+        path: /home/runner/work/WebGoat/WebGoat/target/webgoat-2023.5-SNAPSHOT.jar
   Veracode_SAST:
     runs-on: ubuntu-latest
     needs: build
