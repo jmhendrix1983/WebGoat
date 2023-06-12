@@ -26,11 +26,11 @@ jobs:
           architecture: x64
 
       - name: Build with Maven
+        id: build
         run: |
           mvn -B package --file pom.xml
           ARTIFACT_NAME=$(mvn -q --file pom.xml help:evaluate -Dexpression=project.build.finalName -DforceStdout)
           ARTIFACT_NAME="$ARTIFACT_NAME.jar"
-          echo $ARTIFACT_NAME >> $GITHUB_ENV
           echo $ARTIFACT_NAME > ${{ env.ARTIFACT_NAME_FILE }}
 
       - name: Publicando Artefato
@@ -56,7 +56,7 @@ jobs:
       - name: Ler Nome do Artefato
         id: artifactName
         run: |
-          echo ::set-output name=artifact_name::$(cat ${{ env.ARTIFACT_NAME_FILE }})
+          cat ${{ env.ARTIFACT_NAME_FILE }}
 
       - uses: veracode/veracode-uploadandscan-action@master # Faz a análise da Veracode
         env:
@@ -69,6 +69,6 @@ jobs:
           criticality: 'VeryHigh'
           appname: 'WebGoatAction'
           createsandbox: true
-          filepath: target/${{ steps.artifactName.outputs.artifact_name }}
+          filepath: target/${{ steps.artifactName.outputs.run }}
           deleteIncompleteScan: false
           version: ${{ github.run_id }}
