@@ -48,21 +48,10 @@ jobs:
         with:
           name: pacoteVeracode
 
-      - name: Criar Arquivo Zip
-        run: |
-          cd ${{ github.workspace }}
-          zip -r target/veracode.zip target/${{ env.ARTIFACT_NAME }}
-
       - name: Ler Nome do Artefato
         id: artifactName
         run: |
           cat ${{ github.workspace }}/${{ env.ARTIFACT_NAME_FILE }}
-
-      - name: Publicar Arquivo Zip
-        uses: actions/upload-artifact@v2
-        with:
-          name: veracodeZip
-          path: target/veracode.zip
 
       - uses: veracode/veracode-uploadandscan-action@master # Faz a análise da Veracode
         env:
