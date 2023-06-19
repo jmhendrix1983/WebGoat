@@ -48,11 +48,6 @@ jobs:
         with:
           name: pacoteVeracode
 
-      - name: Ler Nome do Artefato
-        id: artifactName
-        run: |
-          cat ${{ github.workspace }}/${{ env.ARTIFACT_NAME_FILE }}
-
       - uses: veracode/veracode-uploadandscan-action@master # Faz a análise da Veracode
         env:
           VID: 'fc91d654693390d73ce3088b95004aeb' # Lembrar de criar as credenciais no Secrets
