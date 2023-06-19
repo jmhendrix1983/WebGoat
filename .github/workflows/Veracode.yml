@@ -63,4 +63,13 @@ jobs:
           deleteIncompleteScan: false
           version: ${{ github.run_id }}
           scantimeout: 30
-    
+          
+  Veracode_SCA:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Veracode SCA
+        env:
+          SRCCLR_API_TOKEN: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzgyNzkzLCJleHAiOjE2ODcxOTMzMjksImF1dGhvcml0aWVzIjoiQUdFTlQiLCJqdGkiOiJmMmYzZjEzYi0zOTU3LTQ2OTEtOTU1NS01ZmYyZThkMjc4YjYiLCJjbGllbnRfaWQiOiIiLCJzY29wZSI6W119.yuNzULhOc8PlkFqvk81YRMnRomIP_iSZYBE1TsGkR9oqjpG4IGlL6j5W276J8TA4KnduPD_qhutGcrWQ9DzKTOvawWe5cVekdiVyXDGT8TTwReIlVRNA-gKbIaeJO2Q5sjAJAq5036O4F3YHo6jB3meNq78S-BgKzezAQCAP5Ds
+        run: |
+          curl -sSL 'https://download.sourceclear.com/ci.sh' | bash -s – scan --update-advisor --pull-request --allow-dirty
