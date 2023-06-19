@@ -62,3 +62,32 @@ jobs:
           filepath: webgoat-2023.5-SNAPSHOT.jar
           deleteIncompleteScan: false
           version: ${{ github.run_id }}
+          scantimeout: 30
+          
+  Veracode_SCA:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Veracode SCA
+        env:
+          SRCCLR_API_TOKEN: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mzc0Mzk0LCJleHAiOjE2ODcxODkxODQsImF1dGhvcml0aWVzIjoiQUdFTlQiLCJqdGkiOiJiYjU0MjQ0MC02ZTE5LTRkOTItYTliOC1kYjg3ZTBiNWU3NzEiLCJjbGllbnRfaWQiOiIiLCJzY29wZSI6W119.gHpS4WwyjoW7HRYZpQBL4g849VedP-6M_daDvOKhwcZIWcZy-QhBTmRscO7OiF7gZFopqNDCK5A8s8C2qwdQX8gzCM3PpwNcxm_y9q_sIKbsGBFBT98XVgkWH-00mThR0IEflL_-9CjOIGgcGT75MsTMTxr_HX7gFXPi4rnMCMY
+        run: |
+          curl -sSL 'https://download.sourceclear.com/ci.sh' | bash -s – scan --update-advisor --pull-request --allow-dirty
+          
+  Veracode_PipelineScan:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download Artefato
+        uses: actions/download-artifact@v2
+        with:
+          name: pacoteVeracode
+      - name: Veracode Pipeline Scan
+        env:
+          VID: 'fc91d654693390d73ce3088b95004aeb' # Lembrar de criar as credenciais no Secrets
+          VKEY: 'a9133442205c6624805dfa8b0306823ef6bfc548416224491594cb2a907ae573f1df6ad2f746e8693d0fc8f66a1b281efba343e04afdf61c52ce994f6ff21e73'
+          CaminhoArquivo: webgoat-2023.5-SNAPSHOT.jar
+        run: |
+          curl -sSO https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
+          unzip pipeline-scan-LATEST.zip
+          java -jar pipeline-scan.jar -vid $VID -vkey $VKEY -f $CaminhoArquivo
