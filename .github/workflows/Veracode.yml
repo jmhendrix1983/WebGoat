@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  ARTIFACT_NAME_FILE: 'artifact_name.txt1'
+  ARTIFACT_NAME_FILE: 'artifact_name.txt'
 
 jobs:
   build:
