@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  ARTIFACT_NAME_FILE: 'artifact_name.txt'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          architecture: x64
+
+      - name: Build with Maven
+        id: build
+        run: |
+          mvn -B package --file pom.xml
+          ARTIFACT_NAME=$(mvn -q --file pom.xml help:evaluate -Dexpression=project.build.finalName -DforceStdout)
+          ARTIFACT_NAME="$ARTIFACT_NAME.jar"
+          echo $ARTIFACT_NAME > ${{ env.ARTIFACT_NAME_FILE }}
+
+      - name: Publicando Artefato
+        uses: actions/upload-artifact@v2
+        with:
+          name: pacoteVeracode
+          path: /home/runner/work/WebGoat/WebGoat/target/webgoat-2023.5-SNAPSHOT.jar
+
+  Veracode_SAST:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download Artefato
+        uses: actions/download-artifact@v2
+        with:
+          name: pacoteVeracode
+
+      - uses: veracode/veracode-uploadandscan-action@master # Faz a análise da Veracode
+        env:
+          VID: 'fc91d654693390d73ce3088b95004aeb' # Lembrar de criar as credenciais no Secrets
+          VKEY: 'a9133442205c6624805dfa8b0306823ef6bfc548416224491594cb2a907ae573f1df6ad2f746e8693d0fc8f66a1b281efba343e04afdf61c52ce994f6ff21e73'
+          AppName: Github Actions - ${{ github.repository }}
+        with:
+          vid: '$VID'
+          vkey: '$VKEY'
+          criticality: 'VeryHigh'
+          appname: 'WebGoatAction'
+          createsandbox: true
+          filepath: webgoat-2023.5-SNAPSHOT.jar
+          deleteIncompleteScan: false
+          version: ${{ github.run_id }}
