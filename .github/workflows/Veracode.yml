@@ -43,6 +43,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Install PHP Composer
+        run: composer install
       - name: Veracode SCA
         env:
           SRCCLR_SCM_TYPE: GITHUB
